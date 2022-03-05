@@ -8,10 +8,10 @@ public class Quest {
 
     public Quest(String newName, String newDescription, double newLatitude, double newLongitude)
     {
-this.questName = newName;
-this.questDescription = newDescription;
-this.questLatitude = newLatitude;
-this.questLongitude = newLongitude;
+        this.questName = newName;
+        this.questDescription = newDescription;
+        this.questLatitude = newLatitude;
+        this.questLongitude = newLongitude;
     }
     public  String getQuestName(){
         return  questName;
