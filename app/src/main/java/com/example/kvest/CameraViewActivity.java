@@ -1,7 +1,6 @@
 package com.example.kvest;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
@@ -10,10 +9,11 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.geo.GeoPoint;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,20 +68,17 @@ public class CameraViewActivity extends Activity implements
     }
     //создаем экземпляр покемона с указанием координат его местоположения
     private void setAugmentedRealityPoint() {
-        quest = new Quest(
-                "Go To Home",
-                "Бежим до дома",
-                TARGET_LATITUDE,
-                TARGET_LONGITUDE
-        );
+        GeoPoint geoPoint = new GeoPoint(TARGET_LATITUDE, TARGET_LONGITUDE);
+
+        quest = new Quest("Go To Home", "Бежим до дома", geoPoint);
     }
     /*вычисляем дистанцию между устройством и покемоном по формуле, о которой я говорил в начале урока.
     Результат приходит в десятичных градусах, умножение его на 100000 дает некую условную единицу,
     приблизительно равную 0.9м. Чтобы перевести результат в метрическую систему, нужно применять
     сложные расчеты, и я решил не усложнять приложение.*/
     public double calculateDistance() {
-        double dX = quest.getQuestLatitude() - mMyLatitude;
-        double dY = quest.getQuestLongitude() - mMyLongitude;
+        double dX = quest.getLatitude() - mMyLatitude;
+        double dY = quest.getLongitude() - mMyLongitude;
 
         double distance = (Math. sqrt(Math.pow (dX, 2 ) + Math.pow(dY, 2 )) * 100000 );
 
@@ -90,8 +87,8 @@ public class CameraViewActivity extends Activity implements
     /*вычисляем теоретический азимут по формуле, о которой я говорил в начале урока.
     Вычисление азимута для разных четвертей производим на основе таблицы. */
     public double calculateTeoreticalAzimuth() {
-        double dX = quest.getQuestLatitude() - mMyLatitude;
-        double dY = quest.getQuestLongitude() - mMyLongitude ;
+        double dX = quest.getLatitude() - mMyLatitude;
+        double dY = quest.getLongitude() - mMyLongitude ;
 
         double phiAngle;
         double tanPhi;
@@ -134,13 +131,10 @@ public class CameraViewActivity extends Activity implements
     //Метод isBetween определяет, находится ли азимут в целевом диапазоне с учетом допустимых отклонений
     private boolean isBetween( double minAngle, double maxAngle, double azimuth) {
         if (minAngle > maxAngle) {
-            if (isBetween( 0, maxAngle, azimuth) && isBetween(minAngle, 360 , azimuth))
-                return true ;
+            return isBetween(0, maxAngle, azimuth) && isBetween(minAngle, 360, azimuth);
         } else {
-            if (azimuth > minAngle && azimuth < maxAngle)
-                return true ;
+            return azimuth > minAngle && azimuth < maxAngle;
         }
-        return false;
     }
     // выводим на экран основную информацию о местоположении цели и нашего устройства
     private void updateDescription() {
@@ -149,7 +143,7 @@ public class CameraViewActivity extends Activity implements
         int tAzimut = ( int ) mAzimuthTeoretical ;
         int rAzimut = ( int ) mAzimuthReal ;
 
-        String text = quest.getQuestName()
+        String text = quest.getName()
                 + " location:"
                 + "\n latitude: " + TARGET_LATITUDE + "  longitude: " + TARGET_LONGITUDE
                 + "\n Current location:"
@@ -175,7 +169,7 @@ public class CameraViewActivity extends Activity implements
         mAzimuthTeoretical = calculateTeoreticalAzimuth();
         int distance = ( int ) calculateDistance();
 
-        pointerIcon = (ImageView) findViewById(R.id. icon );
+        pointerIcon = findViewById(R.id. icon );
 
         double minAngle = calculateAzimuthAccuracy(mAzimuthTeoretical ).get( 0);
         double maxAngle = calculateAzimuthAccuracy(mAzimuthTeoretical ).get( 1);
@@ -236,12 +230,12 @@ public class CameraViewActivity extends Activity implements
     }
     //метод setupLayout инициализирует все элементы экрана и создает surfaceView для отображения превью камеры
     private void setupLayout() {
-        descriptionTextView = (TextView) findViewById(R.id.cameraTextView );
+        descriptionTextView = findViewById(R.id.cameraTextView );
 
         //btnMap.setVisibility(View. VISIBLE );
         //btnMap.setOnClickListener( this );
         getWindow().setFormat(PixelFormat. UNKNOWN);
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.cameraview );
+        SurfaceView surfaceView = findViewById(R.id.cameraview );
         mSurfaceHolder = surfaceView.getHolder();
         mSurfaceHolder.addCallback( this );
         mSurfaceHolder.setType(SurfaceHolder. SURFACE_TYPE_PUSH_BUFFERS );

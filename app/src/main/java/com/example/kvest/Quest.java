@@ -1,31 +1,32 @@
 package com.example.kvest;
 
+import com.geo.GeoPoint;
+
 public class Quest {
-    private String questName;
-    private String questDescription;
-    private double questLatitude;
-    private double questLongitude;
+    private String name;
+    private String description;
+    private GeoPoint geoPoint;
 
-    public Quest(String newName, String newDescription, double newLatitude, double newLongitude)
+    public Quest(String newName, String newDescription, GeoPoint geoPoint)
     {
-        this.questName = newName;
-        this.questDescription = newDescription;
-        this.questLatitude = newLatitude;
-        this.questLongitude = newLongitude;
+        this.name = newName;
+        this.description = newDescription;
+        this.geoPoint = geoPoint;
     }
-    public  String getQuestName(){
-        return  questName;
 
+    public String getName(){
+        return name;
     }
-    public String getQuestDescription()
+
+    public String getDescription()
     {
-        return  questDescription;
+        return description;
     }
-    public double getQuestLatitude(){
-        return questLatitude;
+    public double getLatitude(){
+        return geoPoint.latitude;
     }
-    public double getQuestLongitude()
+    public double getLongitude()
     {
-        return questLongitude;
+        return geoPoint.longitude;
     }
 }
